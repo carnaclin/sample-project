@@ -20,7 +20,7 @@ func check(e error) {
 }
 
 // Looks for .txt extensions in all folders
-func execute(result *os.File) filepath.WalkFunc {
+func processTxtFiles(result *os.File) filepath.WalkFunc {
 	return func(path string, info os.FileInfo, err error) error {
 		if filepath.Ext(path) == ".txt" {
 			countLines(path, result)
@@ -44,17 +44,27 @@ func countLines(path string, result *os.File) {
 
 func main() {
 	start := time.Now()
+	fileNamePtr := flag.String("output", "", "file with result data")
+	rootPtr := flag.String("root", "", "location of root folder")
+
 	flag.Parse()
-	root := flag.Arg(0)
+	root := *rootPtr
+	fileName := *fileNamePtr
+	if root == "" || fileName == "" {
+		panic("please define all Flags")
+	}
 
 	// Create file to store results
-	outputFile, err := os.Create("result.csv")
+	outputFile, err := os.Create(fileName)
 	check(err)
+	defer outputFile.Close()
+
+	// Write headers
+	fmt.Fprintf(outputFile, "File name,Numeber of lines\n")
 
 	// Go through directory
-	err = filepath.Walk(root, execute(outputFile))
+	err = filepath.Walk(root, processTxtFiles(outputFile))
 	check(err)
 
-	outputFile.Close()
 	fmt.Printf("Time elapsed: %s", time.Since(start))
 }
