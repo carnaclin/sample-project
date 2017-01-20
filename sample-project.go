@@ -1,3 +1,6 @@
+// Sample project by Fernando Nara
+// 20/01/17
+
 package main
 
 import (
@@ -9,12 +12,14 @@ import (
 	"time"
 )
 
+// Error handling
 func check(e error) {
 	if e != nil {
 		panic(e)
 	}
 }
 
+// Looks for .txt extensions in all folders
 func execute(result *os.File) filepath.WalkFunc {
 	return func(path string, info os.FileInfo, err error) error {
 		if filepath.Ext(path) == ".txt" {
@@ -24,6 +29,7 @@ func execute(result *os.File) filepath.WalkFunc {
 	}
 }
 
+// Count lines and print results for each file found
 func countLines(path string, result *os.File) {
 	inputFile, err := os.Open(path)
 	check(err)
@@ -38,15 +44,17 @@ func countLines(path string, result *os.File) {
 
 func main() {
 	start := time.Now()
-
 	flag.Parse()
 	root := flag.Arg(0)
+
+	// Create file to store results
 	outputFile, err := os.Create("result.csv")
 	check(err)
+
+	// Go through directory
 	err = filepath.Walk(root, execute(outputFile))
 	check(err)
-	outputFile.Close()
 
-	elapsed := time.Since(start)
-	fmt.Printf("Time elapsed: %s", elapsed)
+	outputFile.Close()
+	fmt.Printf("Time elapsed: %s", time.Since(start))
 }
