@@ -9,23 +9,23 @@ import (
 )
 
 type testdata struct {
-	path   string
-	result int
+	path  string
+	count int
 }
 
 var tests = []testdata{
 	{"test1.txt", 7539},
 	{"test2.txt", 10570},
-	{"test3.txt", 5776},
+	{"test3.txt", 4577},
 }
 
-func TestcountLines(t *testing.T) {
+func TestCountLines(t *testing.T) {
 	for _, pair := range tests {
 		lineCount := countLines(pair.path)
-		if lineCount != pair.result {
+		if lineCount != pair.count {
 			t.Error(
 				"For", filepath.Base(pair.path),
-				"expected", pair.result,
+				"expected", pair.count,
 				"got", lineCount,
 			)
 		}
