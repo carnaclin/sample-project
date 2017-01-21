@@ -20,17 +20,18 @@ func check(e error) {
 }
 
 // Looks for .txt extensions in all folders
-func processTxtFiles(result *os.File) filepath.WalkFunc {
+func processTxtFiles(outputFile *os.File) filepath.WalkFunc {
 	return func(path string, info os.FileInfo, err error) error {
 		if filepath.Ext(path) == ".txt" {
-			countLines(path, result)
+			lineCount := countLines(path)
+			writeToFile(path, lineCount, outputFile)
 		}
 		return nil
 	}
 }
 
 // Count lines and print results for each file found
-func countLines(path string, result *os.File) {
+func countLines(path string) int {
 	inputFile, err := os.Open(path)
 	check(err)
 	defer inputFile.Close()
@@ -39,23 +40,25 @@ func countLines(path string, result *os.File) {
 	for fileScanner.Scan() {
 		lineCount++
 	}
-	fmt.Fprintf(result, "%s, %d\n", filepath.Base(path), lineCount)
+	return lineCount
+}
+
+// Write results to output file
+func writeToFile(path string, lineCount int, outputFile *os.File) {
+	fmt.Fprintf(outputFile, "%s, %d\n", filepath.Base(path), lineCount)
 }
 
 func main() {
 	start := time.Now()
-	fileNamePtr := flag.String("output", "", "file with result data")
 	rootPtr := flag.String("root", "", "location of root folder")
-
 	flag.Parse()
 	root := *rootPtr
-	fileName := *fileNamePtr
-	if root == "" || fileName == "" {
+	if root == "" {
 		panic("please define all Flags")
 	}
 
 	// Create file to store results
-	outputFile, err := os.Create(fileName)
+	outputFile, err := os.Create("results.csv")
 	check(err)
 	defer outputFile.Close()
 
