@@ -32,6 +32,7 @@ func processTxtFiles(outputFile *os.File) filepath.WalkFunc {
 
 // Count lines and print results for each file found
 func countLines(path string) int {
+	// Implement word counter with line counter
 	inputFile, err := os.Open(path)
 	check(err)
 	defer inputFile.Close()
@@ -40,6 +41,7 @@ func countLines(path string) int {
 	for fileScanner.Scan() {
 		lineCount++
 	}
+
 	return lineCount
 }
 
